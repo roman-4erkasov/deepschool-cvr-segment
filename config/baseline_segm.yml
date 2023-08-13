@@ -1,0 +1,41 @@
+project_name: 'barcode_detection'
+experiment_name: 'baseline'
+n_epochs: 30
+lr: 1e-3
+accelerator: 'cpu'
+device: 0
+task: detection
+monitor_metric: 'val_iou'
+monitor_mode: 'max'
+optimizer: 'torch.optim.AdamW'
+optimizer_kwargs: { weight_decay: 1e-5 }
+scheduler: 'torch.optim.lr_scheduler.CosineAnnealingLR'
+scheduler_kwargs:
+    T_max: 10
+    eta_min: 1e-5
+cls_losses:
+    -
+        name: 'bce'
+        weight: 0.3
+        loss_fn: 'torch.nn.BCEWithLogitsLoss'
+        loss_kwargs: {}
+seg_losses:
+    -
+        name: 'dice'
+        weight: 0.7
+        loss_fn: 'segmentation_models_pytorch.losses.DiceLoss'
+        loss_kwargs: {mode: 'binary', from_logits: true}
+data_config:
+    n_classes: 2
+    batch_size: 4
+    n_workers: 4
+    train_size: 0.8
+    val_size: 0.1
+    img_width: 1600
+    img_height: 256
+    data_path: /home/${oc.env:USER}/data/goods-barcodes
+    scopes_path: /home/${oc.env:USER}/deepschool-cvr-segment/data/data_split
+    # ann_train: /home/{env:USER}/deepschool-cvr-segment/data/train.tsv
+    # ann_val: /home/{env:USER}/deepschool-cvr-segment/data/val.tsv
+    # ann_test: /home/{env:USER}/deepschool-cvr-segment/data/test.tsv
+    images_path: /home/${oc.env:USER}/data/goods-barcodes/images
